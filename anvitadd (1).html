@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1B4D3E">
+  <title>ANVITA Bình Mỹ | Rau muống tuần hoàn và nông nghiệp bền vững</title>
+  <meta name="description" content="Khám phá quy trình rau muống ANVITA Bình Mỹ, trải nghiệm nông trại và mô hình nông nghiệp tuần hoàn.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root{--cream:#FAF7F2;--cream2:#EFE3C8;--green:#1B4D3E;--green2:#2D6A4F;--leaf:#52B788;--orange:#E07A5F}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--cream);color:var(--green);font-family:"Be Vietnam Pro",sans-serif}
+    .serif{font-family:"Playfair Display",serif}
+    #home h1{letter-spacing:-.035em;line-height:1.08;overflow-wrap:normal;text-wrap:balance}
+    #home h1 span{display:inline-block;padding-top:.04em;padding-bottom:.08em}
+    .illustrated-map{position:relative;height:390px;overflow:hidden;border-radius:1rem;background:#e7efcf;background-image:linear-gradient(25deg,transparent 47%,rgba(255,255,255,.92) 48%,rgba(255,255,255,.92) 51%,transparent 52%),linear-gradient(115deg,transparent 44%,rgba(255,255,255,.85) 45%,rgba(255,255,255,.85) 48%,transparent 49%),linear-gradient(70deg,transparent 67%,rgba(255,255,255,.9) 68%,rgba(255,255,255,.9) 70%,transparent 71%),repeating-linear-gradient(0deg,rgba(98,145,88,.08) 0 2px,transparent 2px 34px)}
+    .map-road{position:absolute;height:18px;background:#fff7df;border:2px solid #e4d5ac;border-left:0;border-right:0;border-radius:50px;transform-origin:center}
+    .map-river{position:absolute;width:150%;height:54px;left:-20%;top:63%;background:#9ed8d0;transform:rotate(-17deg);border:5px solid #d5eee4;border-left:0;border-right:0;border-radius:50%;opacity:.9}
+    .map-label{position:absolute;font-size:11px;font-weight:700;color:#3b6047;background:rgba(255,255,255,.78);padding:4px 7px;border-radius:7px;box-shadow:0 2px 8px #33553318}
+    .map-pin{position:absolute;display:flex;align-items:center;gap:6px;border:2px solid white;border-radius:999px;background:#1b4d3e;color:white;padding:7px 10px;font-size:12px;font-weight:700;box-shadow:0 5px 15px #1b4d3e40;cursor:pointer;transition:transform .2s}
+    .map-pin:hover,.map-pin:focus{transform:translateY(-3px) scale(1.03);outline:2px solid #e4ce9f}
+    .map-compass{position:absolute;right:12px;top:12px;border-radius:50%;width:36px;height:36px;display:grid;place-items:center;background:#fffdf4;color:#1b4d3e;font-weight:800;box-shadow:0 3px 12px #1b4d3e20}
+    @media(max-width:640px){.illustrated-map{height:320px}.map-pin{font-size:10px;padding:6px 8px}}
+    .hero{background:linear-gradient(115deg,rgba(15,48,38,.9),rgba(27,77,62,.67)),url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=2000&q=85") center/cover}
+    .glass{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px)}
+    .card{background:white;border:1px solid var(--cream2);border-radius:1.25rem;box-shadow:0 10px 30px -18px rgba(27,77,62,.28)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;border-radius:999px;padding:.8rem 1.2rem;font-weight:700;transition:.2s}
+    .btn-primary{background:var(--green2);color:white}.btn-primary:hover{background:var(--green)}
+    .btn-light{background:#F4EAD5;color:var(--green)}.btn-light:hover{background:#EFE3C8}
+    .field{width:100%;border:1px solid #D8D0BF;background:white;border-radius:.75rem;padding:.8rem .9rem;color:#1B4D3E;outline:none}
+    .field:focus{border-color:#2D6A4F;box-shadow:0 0 0 3px rgba(45,106,79,.12)}
+    .field-label{display:block;font-size:.82rem;font-weight:700;margin-bottom:.4rem}
+    .section-pad{padding:5rem 0}
+    .eco-card[aria-pressed="true"]{border-color:#2D6A4F;box-shadow:0 8px 24px -12px rgba(27,77,62,.5);transform:translateY(-2px)}
+    #farm-map{height:390px;border-radius:1rem;z-index:1}
+    .status{padding:.85rem 1rem;border-radius:.75rem;font-size:.9rem}
+    .status-ok{background:#D8F3DC;color:#1B4D3E;border:1px solid #9ED5AC}
+    .status-error{background:#FDE8E4;color:#8D3426;border:1px solid #F3B6A9}
+    .status-info{background:#F4EAD5;color:#5D482B;border:1px solid #E4CE9F}
+    .step-number{width:2.4rem;height:2.4rem;display:grid;place-items:center;border-radius:50%;background:#D8F3DC;font-weight:700}
+    @media(max-width:640px){.section-pad{padding:3.5rem 0}#farm-map{height:320px}}
+  </style>
+</head>
+<body>
+<header id="navbar" class="fixed top-0 inset-x-0 z-50 text-white transition-all duration-300">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-[76px]" aria-label="Điều hướng chính">
+    <a href="#home" class="flex items-center gap-3" aria-label="ANVITA - về đầu trang">
+      <span class="w-11 h-11 rounded-full bg-[#F4EAD5] text-[#1B4D3E] grid place-items-center"><i data-lucide="sprout"></i></span>
+      <span><span class="block serif font-bold text-2xl leading-tight">ANVITA</span><span class="block text-[10px] tracking-[.18em] uppercase text-[#EFE3C8]">Rau muống Bình Mỹ</span></span>
+    </a>
+    <div class="hidden lg:flex items-center gap-6 text-sm font-semibold">
+      <a class="hover:text-[#E4CE9F]" href="#about">Về ANVITA</a>
+      <a class="hover:text-[#E4CE9F]" href="#eco-tour">Bản đồ trải nghiệm</a>
+      <a class="hover:text-[#E4CE9F]" href="#process">Quy trình</a>
+      <a class="hover:text-[#E4CE9F]" href="#cycle-detail">Mô hình tuần hoàn</a>
+      <a class="hover:text-[#E4CE9F]" href="#traceability">Tra cứu QR</a>
+      <a class="hover:text-[#E4CE9F]" href="#contact">Liên hệ</a>
+    </div>
+    <a href="#visit-tour" class="hidden sm:inline-flex btn btn-light text-sm">Đổi thưởng sticker <i data-lucide="calendar-days" class="w-4 h-4"></i></a>
+    <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-white/10" aria-expanded="false" aria-controls="mobile-menu" aria-label="Mở menu"><i data-lucide="menu"></i></button>
+  </nav>
+  <div id="mobile-menu" class="hidden lg:hidden bg-[#1B4D3E]/98 px-5 pb-5">
+    <div class="flex flex-col gap-1">
+      <a class="py-2" href="#about">Về ANVITA</a><a class="py-2" href="#eco-tour">Bản đồ trải nghiệm</a>
+      <a class="py-2" href="#process">Quy trình</a><a class="py-2" href="#cycle-detail">Mô hình tuần hoàn</a><a class="py-2" href="#traceability">Tra cứu QR</a>
+      <a class="py-2" href="#visit-tour">Đăng ký tham quan</a><a class="py-2" href="#contact">Liên hệ</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="home" class="hero min-h-[92vh] flex items-center text-white pt-24 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 w-full text-center">
+      <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-sm mb-7"><span class="w-2 h-2 bg-[#9ED5AC] rounded-full"></span> Rau muống tuần hoàn · Nông nghiệp bền vững</div>
+      <h1 class="serif text-4xl sm:text-6xl lg:text-7xl font-bold leading-tight max-w-5xl mx-auto">Từ vườn xanh Bình Mỹ<br><span class="text-[#F4EAD5]">đến bàn ăn mỗi nhà</span></h1>
+      <p class="max-w-2xl mx-auto mt-6 mb-9 text-white/85 text-base sm:text-lg leading-relaxed">Khám phá hành trình trồng rau, sơ chế, phân phối và ý tưởng tận dụng phụ phẩm để xây dựng vòng tuần hoàn nông nghiệp.</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-3">
+        <a href="#eco-tour" class="btn btn-light">Khám phá nông trại <i data-lucide="arrow-down" class="w-4 h-4"></i></a>
+        <a href="#traceability" class="btn border border-white/50 text-white hover:bg-white/10">Tra cứu mã lô hàng <i data-lucide="qr-code" class="w-4 h-4"></i></a>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mt-14">
+        <div class="glass rounded-2xl p-4"><div class="serif text-2xl font-bold">01</div><div class="text-xs text-white/80 mt-1">Trồng và chăm sóc</div></div>
+        <div class="glass rounded-2xl p-4"><div class="serif text-2xl font-bold">02</div><div class="text-xs text-white/80 mt-1">Thu hoạch và sơ chế</div></div>
+        <div class="glass rounded-2xl p-4"><div class="serif text-2xl font-bold">03</div><div class="text-xs text-white/80 mt-1">Phân phối sản phẩm</div></div>
+        <div class="glass rounded-2xl p-4"><div class="serif text-2xl font-bold">04</div><div class="text-xs text-white/80 mt-1">Tận dụng phụ phẩm</div></div>
+      </div>
+      <p class="text-xs text-white/60 mt-5">Thông tin trên trang là nội dung giới thiệu/mô phỏng; hãy cập nhật dữ liệu thực tế trước khi công bố thương mại.</p>
+    </div>
+  </section>
+
+  <section id="about" class="section-pad">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
+      <div class="rounded-3xl overflow-hidden min-h-[320px]">
+        <img class="w-full h-[420px] object-cover" src="https://images.unsplash.com/photo-1499529112087-3cb3b73a0bb7?auto=format&fit=crop&w=1200&q=80" alt="Cảnh quan nông nghiệp xanh" onerror="this.src='https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80'">
+      </div>
+      <div>
+        <span class="text-sm uppercase tracking-widest font-bold text-[#40916C]">Câu chuyện ANVITA</span>
+        <h2 class="serif text-3xl sm:text-4xl font-bold mt-3 mb-5">Một mô hình nông nghiệp hướng đến tuần hoàn</h2>
+        <p class="leading-7 text-[#41685A] mb-4">Rau muống là loại rau quen thuộc trong bữa ăn Việt. Dự án ANVITA Bình Mỹ hướng đến việc kể lại hành trình của rau từ khâu canh tác, thu hoạch, sơ chế đến khi đến tay người tiêu dùng.</p>
+        <p class="leading-7 text-[#41685A] mb-6">Bên cạnh sản phẩm chính, phụ phẩm thực vật có thể được phân loại để nghiên cứu phương án tái sử dụng phù hợp. Mọi hoạt động sử dụng làm thức ăn chăn nuôi hoặc phân hữu cơ cần được đánh giá an toàn và triển khai theo quy trình thực tế.</p>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div class="card p-4 flex gap-3"><i data-lucide="leaf" class="text-[#40916C] shrink-0"></i><div><b class="block text-sm">Canh tác có trách nhiệm</b><span class="text-xs text-slate-500">Theo dõi nguồn nước và đầu vào</span></div></div>
+          <div class="card p-4 flex gap-3"><i data-lucide="recycle" class="text-[#40916C] shrink-0"></i><div><b class="block text-sm">Tư duy tuần hoàn</b><span class="text-xs text-slate-500">Giảm lãng phí phụ phẩm</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="eco-tour" class="section-pad bg-[#F4EAD5]/60 border-y border-[#EFE3C8]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <span class="text-xs font-bold tracking-widest uppercase text-[#40916C]">Du lịch sinh thái nông nghiệp</span>
+        <h2 class="serif text-3xl sm:text-4xl font-bold mt-3 mb-4">Bản đồ khu trải nghiệm vùng rau Bình Mỹ</h2>
+        <p class="text-[#41685A]">Chọn một điểm trải nghiệm để xem mô tả. Vị trí trên bản đồ hiện là điểm minh họa quanh Bình Mỹ; hãy thay bằng tọa độ và địa chỉ đã xác nhận trước khi sử dụng thực tế.</p>
+      </div>
+      <div class="grid lg:grid-cols-[.9fr_1.1fr] gap-6 items-start">
+        <div class="space-y-4">
+          <button class="eco-card card w-full text-left p-5 flex gap-4 transition" data-eco="field" aria-pressed="true">
+            <span class="w-12 h-12 rounded-xl bg-[#D8F3DC] grid place-items-center shrink-0"><i data-lucide="sprout"></i></span>
+            <span><b class="block mb-1">1. Ruộng rau muống</b><span class="text-sm text-slate-600">Tìm hiểu luống trồng, chăm sóc và thu hoạch an toàn.</span></span>
+          </button>
+          <button class="eco-card card w-full text-left p-5 flex gap-4 transition" data-eco="cycle" aria-pressed="false">
+            <span class="w-12 h-12 rounded-xl bg-[#D8F3DC] grid place-items-center shrink-0"><i data-lucide="recycle"></i></span>
+            <span><b class="block mb-1">2. Góc mô hình tuần hoàn</b><span class="text-sm text-slate-600">Phân loại phụ phẩm và tìm hiểu hướng tái sử dụng.</span></span>
+          </button>
+          <button class="eco-card card w-full text-left p-5 flex gap-4 transition" data-eco="packing" aria-pressed="false">
+            <span class="w-12 h-12 rounded-xl bg-[#D8F3DC] grid place-items-center shrink-0"><i data-lucide="package-check"></i></span>
+            <span><b class="block mb-1">3. Khu sơ chế và đóng gói</b><span class="text-sm text-slate-600">Tìm hiểu phân loại, làm sạch, đóng gói và gắn nhãn.</span></span>
+          </button>
+          <div id="eco-detail" class="card p-5" aria-live="polite">
+            <div class="flex items-center gap-2 mb-2"><i data-lucide="map-pin" class="text-[#40916C]"></i><h3 class="serif text-xl font-bold">Ruộng rau muống</h3></div>
+            <p class="text-sm leading-6 text-slate-600">Điểm minh họa cho hoạt động tìm hiểu cách trồng, chăm sóc và thu hoạch rau. Chỉ tổ chức trải nghiệm khi có sự đồng ý của đơn vị quản lý và hướng dẫn an toàn.</p>
+          </div>
+        </div>
+        <div class="card p-3">
+          <div id="farm-map" class="illustrated-map" role="img" aria-label="Bản đồ minh họa khu trải nghiệm nông nghiệp Bình Mỹ">
+            <div class="map-river"></div>
+            <div class="map-road" style="width:120%;left:-8%;top:28%;transform:rotate(16deg)"></div>
+            <div class="map-road" style="width:95%;left:13%;top:48%;transform:rotate(-32deg)"></div>
+            <div class="map-road" style="width:78%;left:27%;top:77%;transform:rotate(12deg)"></div>
+            <div class="absolute rounded-[45%] bg-[#b9d9a1]/80 border border-[#91bd7b]" style="width:115px;height:82px;left:8%;top:8%;transform:rotate(-15deg)"></div>
+            <div class="absolute rounded-[45%] bg-[#b9d9a1]/80 border border-[#91bd7b]" style="width:145px;height:95px;right:7%;top:14%;transform:rotate(18deg)"></div>
+            <div class="absolute rounded-[45%] bg-[#b9d9a1]/80 border border-[#91bd7b]" style="width:120px;height:75px;left:35%;bottom:8%;transform:rotate(8deg)"></div>
+            <span class="map-label" style="left:8%;top:7%">Vườn xanh Bình Mỹ</span>
+            <span class="map-label" style="right:8%;top:37%">Khu dân cư</span>
+            <span class="map-label" style="left:12%;bottom:15%">Kênh xanh</span>
+            <span class="map-label" style="right:12%;bottom:8%">Đường nông thôn</span>
+            <span class="map-compass">N ↑</span>
+            <button class="map-pin" data-map-pin="field" style="left:7%;top:37%"><span>🌱</span> Ruộng rau</button>
+            <button class="map-pin" data-map-pin="cycle" style="right:5%;top:55%"><span>♻️</span> Tuần hoàn</button>
+            <button class="map-pin" data-map-pin="packing" style="left:34%;bottom:8%"><span>📦</span> Sơ chế</button>
+            <div class="absolute left-3 bottom-3 rounded-lg bg-white/85 px-3 py-2 text-[10px] text-[#41685A] shadow">BẢN ĐỒ MINH HỌA · KHÔNG PHẢI BẢN ĐỒ ĐỊA CHÍNH</div>
+          </div>
+          <div class="flex items-start gap-2 p-3 text-xs text-slate-500"><i data-lucide="info" class="w-4 h-4 shrink-0"></i><span>Bản đồ minh họa được thiết kế riêng để trang trí và chọn điểm trải nghiệm; vị trí không phải tọa độ thực tế đã xác minh.</span></div>
+          <a class="text-sm font-bold text-[#2D6A4F] px-3 pb-3 inline-flex items-center gap-2" href="https://www.openstreetmap.org/search?query=Binh%20My%2C%20Cu%20Chi%2C%20Ho%20Chi%20Minh%20City" target="_blank" rel="noopener">Tìm Bình Mỹ trên OpenStreetMap <i data-lucide="external-link" class="w-4 h-4"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" class="section-pad">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="text-center max-w-3xl mx-auto mb-12"><span class="text-xs uppercase tracking-widest font-bold text-[#40916C]">Từ vườn đến bàn ăn</span><h2 class="serif text-3xl sm:text-4xl font-bold mt-3 mb-4">Quy trình 4 bước</h2><p class="text-[#41685A]">Quy trình mẫu để trình bày dự án; điều chỉnh theo hoạt động thực tế của cơ sở.</p></div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <article class="card p-6"><div class="step-number mb-4">01</div><i data-lucide="sprout" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Trồng và chăm sóc</h3><p class="text-sm text-slate-600 leading-6">Theo dõi đất, nước, sinh trưởng và nhật ký canh tác.</p></article>
+        <article class="card p-6"><div class="step-number mb-4">02</div><i data-lucide="scissors" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Thu hoạch, sơ chế</h3><p class="text-sm text-slate-600 leading-6">Loại bỏ phần hư hỏng, phân loại và xử lý theo quy trình vệ sinh.</p></article>
+        <article class="card p-6"><div class="step-number mb-4">03</div><i data-lucide="package" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Đóng gói, phân phối</h3><p class="text-sm text-slate-600 leading-6">Ghi nhãn lô hàng, bảo quản phù hợp và vận chuyển đến điểm bán.</p></article>
+        <article class="card p-6"><div class="step-number mb-4">04</div><i data-lucide="recycle" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Tận dụng phụ phẩm</h3><p class="text-sm text-slate-600 leading-6">Phân loại phụ phẩm và lựa chọn phương án xử lý phù hợp, an toàn.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="cycle-detail" class="section-pad bg-[#F4EAD5]/55 border-y border-[#EFE3C8]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="max-w-3xl mx-auto text-center mb-12">
+        <span class="text-xs uppercase tracking-widest font-bold text-[#40916C]">Mô hình bò – rau muống</span>
+        <h2 class="serif text-3xl sm:text-4xl font-bold mt-3 mb-4">Giới thiệu chi tiết quy trình kết nối tuần hoàn</h2>
+        <p class="text-[#41685A] leading-7">Mô hình hướng đến việc kết nối hoạt động chăn nuôi bò với canh tác rau muống: phụ phẩm được phân loại, xử lý phù hợp rồi xem xét tái sử dụng làm nguồn dinh dưỡng cho đất. Mục tiêu là giảm lãng phí tài nguyên, hỗ trợ cải thiện đất và tạo ra một chu trình sản xuất có trách nhiệm.</p>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-8 items-start mb-10">
+        <div class="rounded-3xl overflow-hidden shadow-sm bg-white">
+          <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80" alt="Cánh đồng nông nghiệp xanh minh họa mô hình tuần hoàn" class="w-full h-72 object-cover" loading="lazy">
+          <div class="p-6">
+            <h3 class="serif text-2xl font-bold mb-3">Vì sao cần tuần hoàn?</h3>
+            <p class="text-sm leading-7 text-slate-600">Trong sản xuất nông nghiệp, phân bò và phần thực vật không dùng làm sản phẩm chính có thể trở thành nguồn tài nguyên nếu được thu gom, xử lý đúng cách. Thay vì thải bỏ tùy tiện, mô hình tổ chức các bước kiểm soát để chuyển hóa phụ phẩm thành vật liệu hữu ích, đồng thời theo dõi chất lượng đất, nước và rau trồng.</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div class="card p-5"><div class="flex gap-3"><span class="w-11 h-11 rounded-xl bg-[#D8F3DC] text-[#1B4D3E] grid place-items-center shrink-0"><i data-lucide="target"></i></span><div><h3 class="font-bold mb-1">Mục tiêu chính</h3><p class="text-sm leading-6 text-slate-600">Tận dụng phụ phẩm có kiểm soát, giảm lượng chất thải chưa được xử lý và bổ sung chất hữu cơ cho đất khi vật liệu đã đạt yêu cầu an toàn.</p></div></div></div>
+          <div class="card p-5"><div class="flex gap-3"><span class="w-11 h-11 rounded-xl bg-[#D8F3DC] text-[#1B4D3E] grid place-items-center shrink-0"><i data-lucide="shield-check"></i></span><div><h3 class="font-bold mb-1">Nguyên tắc an toàn</h3><p class="text-sm leading-6 text-slate-600">Không bón phân bò tươi trực tiếp lên rau ăn được. Cần kiểm soát nguồn nguyên liệu, nhiệt độ và thời gian ủ, độ hoai mục, nguy cơ mầm bệnh và thời gian cách ly theo hướng dẫn chuyên môn.</p></div></div></div>
+          <div class="card p-5"><div class="flex gap-3"><span class="w-11 h-11 rounded-xl bg-[#D8F3DC] text-[#1B4D3E] grid place-items-center shrink-0"><i data-lucide="clipboard-check"></i></span><div><h3 class="font-bold mb-1">Theo dõi và ghi chép</h3><p class="text-sm leading-6 text-slate-600">Ghi lại nguồn phụ phẩm, ngày thu gom, phối trộn, quá trình ủ, ngày sử dụng và khu vực bón để thuận tiện truy xuất, đánh giá hiệu quả và điều chỉnh quy trình.</p></div></div></div>
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <article class="card p-5"><div class="step-number mb-4">01</div><i data-lucide="wheat" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Thu gom phụ phẩm</h3><p class="text-sm text-slate-600 leading-6">Thu gom phân bò và phụ phẩm rau muống riêng biệt; loại bỏ rác, dây nhựa, vật liệu lạ và ghi nhận nguồn phát sinh.</p></article>
+        <article class="card p-5"><div class="step-number mb-4">02</div><i data-lucide="blend" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Sơ chế, phối trộn</h3><p class="text-sm text-slate-600 leading-6">Điều chỉnh độ ẩm và phối trộn vật liệu giàu carbon, giàu nitơ theo hướng dẫn kỹ thuật; không tự ý thêm chế phẩm chưa rõ nguồn gốc.</p></article>
+        <article class="card p-5"><div class="step-number mb-4">03</div><i data-lucide="thermometer" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Ủ phân hữu cơ</h3><p class="text-sm text-slate-600 leading-6">Ủ theo quy trình được kiểm soát, theo dõi nhiệt độ, độ ẩm, thông khí và thời gian. Chỉ sử dụng khi phân đã hoai và đáp ứng yêu cầu an toàn.</p></article>
+        <article class="card p-5"><div class="step-number mb-4">04</div><i data-lucide="sprout" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Bón cho đất trồng</h3><p class="text-sm text-slate-600 leading-6">Sử dụng phân hữu cơ đã xử lý theo nhu cầu đất và cây trồng; bón đúng liều lượng, tránh làm ô nhiễm nguồn nước hoặc rau thu hoạch.</p></article>
+        <article class="card p-5"><div class="step-number mb-4">05</div><i data-lucide="shopping-basket" class="w-8 h-8 text-[#40916C] mb-3"></i><h3 class="font-bold mb-2">Thu hoạch, tiếp nối</h3><p class="text-sm text-slate-600 leading-6">Thu hoạch và sơ chế rau theo quy trình vệ sinh. Phần rau không dùng được tiếp tục được phân loại để đưa vào hướng xử lý phù hợp.</p></article>
+      </div>
+      <div class="mt-8 rounded-2xl bg-white border border-[#E7DFC9] p-5 sm:p-6 flex flex-col sm:flex-row gap-4 items-start">
+        <span class="w-11 h-11 rounded-xl bg-[#D8F3DC] text-[#1B4D3E] grid place-items-center shrink-0"><i data-lucide="refresh-cw"></i></span>
+        <div><h3 class="font-bold mb-1">Một vòng tuần hoàn cần được kiểm chứng</h3><p class="text-sm leading-7 text-slate-600">Sơ đồ trên mô tả định hướng của mô hình, không khẳng định mọi bước đã được triển khai tại trang trại. Trước khi áp dụng thực tế, cần có quy trình kỹ thuật phù hợp, người phụ trách, điều kiện ủ bảo đảm và kiểm tra chất lượng đầu ra. Nếu chưa đủ điều kiện an toàn, phụ phẩm phải được xử lý theo phương án được cơ quan chuyên môn hướng dẫn.</p></div>
+      </div>
+    </div>
+  </section>
+
+ 
+  <section id="traceability" class="section-pad">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 items-start">
+      <div>
+        <span class="text-xs uppercase tracking-widest font-bold text-[#40916C]">Minh bạch thông tin</span>
+        <h2 class="serif text-3xl sm:text-4xl font-bold mt-3 mb-5">Tra cứu mã lô hàng</h2>
+        <p class="text-[#41685A] leading-7 mb-6">Nhập mã lô để xem dữ liệu minh họa. Mã mẫu không chứng minh nguồn gốc, chứng nhận hoặc điều kiện bảo quản của sản phẩm thật. Khi triển khai thương mại, hãy kết nối với cơ sở dữ liệu lô hàng đã xác thực.</p>
+        <div class="card p-5 mb-4"><div class="flex gap-3"><i data-lucide="qr-code" class="w-7 h-7 text-[#40916C] shrink-0"></i><div><b>Tra cứu bằng mã</b><p class="text-sm text-slate-600 mt-1">Bạn có thể thử mã mẫu: <code class="bg-[#F4EAD5] rounded px-1.5 py-0.5">ANVITA-DEMO-001</code> hoặc <code class="bg-[#F4EAD5] rounded px-1.5 py-0.5">ANVITA-DEMO-002</code>.</p></div></div></div>
+        <div class="text-sm text-slate-500 flex gap-2"><i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i><span>QR trên trang chỉ tạo mã chứa văn bản; không tự xác thực chứng nhận hoặc nhật ký sản xuất.</span></div>
+      </div>
+      <div class="card p-6 sm:p-8">
+        <form id="qr-form" class="space-y-4">
+          <label class="field-label" for="batch-code">Mã lô hàng</label>
+          <div class="flex flex-col sm:flex-row gap-3"><input id="batch-code" class="field font-mono" maxlength="60" required placeholder="Ví dụ: ANVITA-DEMO-001"><button class="btn btn-primary shrink-0" type="submit"><i data-lucide="search" class="w-4 h-4"></i> Tra cứu</button></div>
+        </form>
+        <div id="qr-result" class="mt-6" aria-live="polite">
+          <div class="rounded-2xl bg-[#F4EAD5]/60 p-5 text-sm text-slate-600">Nhập mã lô hàng để hiển thị thông tin. Kết quả hiện tại là dữ liệu mẫu dùng để trình diễn giao diện.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section-pad bg-[#EFE3C8]/55 border-t border-[#EFE3C8]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-start">
+      <div>
+        <span class="text-xs uppercase tracking-widest font-bold text-[#40916C]">Kết nối cùng ANVITA</span>
+        <h2 class="serif text-3xl sm:text-4xl font-bold mt-3 mb-5">Liên hệ và yêu cầu đặt hàng</h2>
+        <p class="text-[#41685A] leading-7 mb-7">Dùng biểu mẫu để ghi lại nhu cầu mua lẻ, cung ứng cho nhà hàng hoặc hợp tác phân phối. Thông tin liên hệ bên dưới cần được thay bằng thông tin chính thức trước khi xuất bản.</p>
+        <div class="card p-5 space-y-4 text-sm">
+          <div class="flex gap-3"><i data-lucide="map-pin" class="text-[#40916C] shrink-0"></i><span>Địa chỉ: cập nhật địa chỉ nông trại đã xác minh tại Bình Mỹ, Củ Chi.</span></div>
+          <div class="flex gap-3"><i data-lucide="phone" class="text-[#40916C] shrink-0"></i><span>Điện thoại: cập nhật số hotline chính thức.</span></div>
+          <div class="flex gap-3"><i data-lucide="mail" class="text-[#40916C] shrink-0"></i><span>Email: cập nhật địa chỉ email đang hoạt động.</span></div>
+        </div>
+      </div>
+      <div class="card p-6 sm:p-8">
+        <h3 class="serif text-2xl font-bold mb-6">Gửi yêu cầu liên hệ</h3>
+        <form id="contact-form" class="space-y-4">
+          <div><label class="field-label" for="contact-name">Họ và tên *</label><input id="contact-name" name="name" class="field" required maxlength="100" autocomplete="name" placeholder="Nguyễn Văn A"></div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div><label class="field-label" for="contact-phone">Số điện thoại *</label><input id="contact-phone" name="phone" class="field" type="tel" required pattern="[0-9+(). -]{9,20}" autocomplete="tel" placeholder="0901234567"></div>
+            <div><label class="field-label" for="contact-email">Email</label><input id="contact-email" name="email" class="field" type="email" autocomplete="email" placeholder="ban@example.com"></div>
+          </div>
+          <div><label class="field-label" for="contact-need">Nhu cầu *</label><select id="contact-need" name="need" class="field" required><option value="Mua cá nhân / gia đình">Mua cá nhân / gia đình</option><option value="Cung cấp cho nhà hàng">Cung cấp cho nhà hàng</option><option value="Đại lý / siêu thị">Đại lý / siêu thị</option><option value="Hợp tác mô hình tuần hoàn">Hợp tác mô hình tuần hoàn</option><option value="Khác">Khác</option></select></div>
+          <div><label class="field-label" for="contact-quantity">Số lượng dự kiến (không bắt buộc)</label><input id="contact-quantity" name="quantity" class="field" maxlength="100" placeholder="Ví dụ: 20 kg/tuần"></div>
+          <div><label class="field-label" for="contact-note">Ghi chú</label><textarea id="contact-note" name="note" class="field" rows="3" maxlength="1000" placeholder="Địa điểm giao hàng, thời gian mong muốn..."></textarea></div>
+          <label class="flex gap-2 items-start text-xs text-slate-600"><input id="contact-consent" type="checkbox" required class="mt-1"><span>Tôi đồng ý để thông tin được sử dụng nhằm phản hồi yêu cầu này.</span></label>
+          <button type="submit" class="btn btn-primary w-full"><i data-lucide="send" class="w-4 h-4"></i> Tạo phiếu yêu cầu</button>
+          <div id="contact-feedback" class="hidden" aria-live="polite"></div>
+          <button id="download-contact" class="btn btn-light w-full hidden" type="button"><i data-lucide="download" class="w-4 h-4"></i> Tải phiếu yêu cầu (.txt)</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-[#1B4D3E] text-white/70 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <a href="#home" class="flex items-center gap-2 text-white"><i data-lucide="sprout" class="w-5 h-5"></i><b class="serif">ANVITA Bình Mỹ</b></a>
+    <p class="text-xs text-center">© <span id="year"></span> ANVITA · Website giới thiệu mô hình. Thông tin minh họa cần được xác minh trước khi sử dụng.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  const $ = (selector, root=document) => root.querySelector(selector);
+  const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
+  const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const showStatus = (element, message, type="info") => {
+    element.className = `status status-${type}`;
+    element.textContent = message;
+    element.classList.remove("hidden");
+  };
+  const downloadText = (filename, content) => {
+    const blob = new Blob([content], {type:"text/plain;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  };
+  const formToText = (title, form) => {
+    const lines = [title, "Thời gian tạo phiếu: " + new Date().toLocaleString("vi-VN"), ""];
+    new FormData(form).forEach((value,key)=>lines.push(`${key}: ${value}`));
+    lines.push("", "Lưu ý: Đây là phiếu được tạo trên trình duyệt, chưa được gửi đến ANVITA.");
+    return lines.join("\n");
+  };
+
+  // Icon initialization is guarded so the page still works if the icon CDN is unavailable.
+  if (window.lucide) window.lucide.createIcons();
+  $("#year").textContent = new Date().getFullYear();
+
+  // Responsive menu
+  const menuBtn = $("#mobile-menu-btn"), mobileMenu = $("#mobile-menu");
+  menuBtn.addEventListener("click",()=>{
+    const opening = mobileMenu.classList.contains("hidden");
+    mobileMenu.classList.toggle("hidden", !opening);
+    menuBtn.setAttribute("aria-expanded", String(opening));
+    menuBtn.setAttribute("aria-label", opening ? "Đóng menu" : "Mở menu");
+  });
+  $$("#mobile-menu a").forEach(a=>a.addEventListener("click",()=>{
+    mobileMenu.classList.add("hidden"); menuBtn.setAttribute("aria-expanded","false");
+  }));
+  const updateNav = () => {
+    const nav=$("#navbar");
+    nav.classList.toggle("bg-[#1B4D3E]/95", window.scrollY > 30);
+    nav.classList.toggle("shadow-lg", window.scrollY > 30);
+    nav.classList.toggle("backdrop-blur-md", window.scrollY > 30);
+  };
+  window.addEventListener("scroll", updateNav, {passive:true}); updateNav();
+
+  // Eco cards and detail panel
+  const ecoInfo = {
+    field:{title:"Ruộng rau muống",text:"Điểm minh họa cho hoạt động tìm hiểu cách trồng, chăm sóc và thu hoạch rau. Chỉ tổ chức trải nghiệm khi có sự đồng ý của đơn vị quản lý và hướng dẫn an toàn.",coords:[10.973,106.53],label:"Ruộng rau muống (minh họa)"},
+    cycle:{title:"Góc mô hình tuần hoàn",text:"Giới thiệu cách phân loại phụ phẩm thực vật và các hướng nghiên cứu tái sử dụng. Không sử dụng phụ phẩm làm thức ăn hoặc phân bón nếu chưa đánh giá an toàn và quy trình phù hợp.",coords:[10.979,106.538],label:"Mô hình tuần hoàn (minh họa)"},
+    packing:{title:"Khu sơ chế và đóng gói",text:"Mô phỏng các bước phân loại, làm sạch, đóng gói và gắn nhãn lô hàng. Khu vực sản xuất thực tế chỉ nên tham quan khi được đơn vị vận hành cho phép.",coords:[10.967,106.542],label:"Khu sơ chế (minh họa)"}
+  };
+  const detail=$("#eco-detail");
+  function chooseEco(key){
+    const item=ecoInfo[key]; if(!item) return;
+    $$(".eco-card").forEach(btn=>btn.setAttribute("aria-pressed",String(btn.dataset.eco===key)));
+    $$(".map-pin").forEach(btn=>{btn.style.background=btn.dataset.mapPin===key?"#2D6A4F":"#1B4D3E";btn.style.outline=btn.dataset.mapPin===key?"2px solid #E4CE9F":"none";});
+    detail.innerHTML=`<div class="flex items-center gap-2 mb-2"><i data-lucide="map-pin" class="text-[#40916C]"></i><h3 class="serif text-xl font-bold">${escapeHTML(item.title)}</h3></div><p class="text-sm leading-6 text-slate-600">${escapeHTML(item.text)}</p>`;
+    if(window.lucide) window.lucide.createIcons({root:detail});
+  }
+  $$(".eco-card").forEach(btn=>btn.addEventListener("click",()=>chooseEco(btn.dataset.eco)));
+  $$(".map-pin").forEach(btn=>btn.addEventListener("click",()=>chooseEco(btn.dataset.mapPin)));
+
+    // Visit request: client-side preview only, no backend submission.
+  const visitForm=$("#visit-form"), visitFeedback=$("#visit-feedback"), visitDownload=$("#download-visit");
+  const dateInput=$("#visit-date");
+  const today=new Date(); dateInput.min = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+  let visitText="";
+  visitForm.addEventListener("submit",e=>{
+    e.preventDefault();
+    if(!visitForm.reportValidity()) return;
+    visitText=formToText("PHIẾU ĐĂNG KÝ THAM QUAN ANVITA",visitForm);
+    showStatus(visitFeedback,"Đã tạo phiếu trên thiết bị này. Lịch chưa được đặt và chưa gửi đến nông trại; hãy tải phiếu rồi liên hệ đơn vị phụ trách để xác nhận.","ok");
+    visitDownload.classList.remove("hidden");
+  });
+  visitDownload.addEventListener("click",()=>downloadText("phieu-tham-quan-anvita.txt",visitText));
+
+  // Demo batch records. These are explicitly examples, not real traceability data.
+  const batches={
+    "ANVITA-DEMO-001":{product:"Rau muống (lô minh họa 001)",farm:"Thông tin nông trại chưa kết nối",harvest:"Chưa có dữ liệu xác thực",packing:"Chưa có dữ liệu xác thực",storage:"Chưa có dữ liệu xác thực",status:"Bản ghi mẫu để thử giao diện"},
+    "ANVITA-DEMO-002":{product:"Rau muống (lô minh họa 002)",farm:"Thông tin nông trại chưa kết nối",harvest:"Chưa có dữ liệu xác thực",packing:"Chưa có dữ liệu xác thực",storage:"Chưa có dữ liệu xác thực",status:"Bản ghi mẫu để thử giao diện"}
+  };
+  const qrForm=$("#qr-form"), qrResult=$("#qr-result");
+  function makeQrUrl(code){return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="+encodeURIComponent(code);}
+  qrForm.addEventListener("submit",e=>{
+    e.preventDefault();
+    const code=$("#batch-code").value.trim().toUpperCase();
+    if(!/^[A-Z0-9][A-Z0-9_-]{2,59}$/.test(code)){
+      qrResult.innerHTML='<div class="status status-error">Mã lô chỉ được gồm chữ không dấu, số, dấu gạch ngang hoặc gạch dưới (3–60 ký tự).</div>';return;
+    }
+    const data=batches[code];
+    if(!data){
+      qrResult.innerHTML=`<div class="status status-error"><b>Không tìm thấy mã ${escapeHTML(code)} trong dữ liệu mẫu.</b><p class="mt-1">Đây không phải cơ sở dữ liệu sản xuất thật. Hãy kiểm tra mã hoặc kết nối hệ thống truy xuất của cơ sở.</p></div>`;return;
+    }
+    qrResult.innerHTML=`<div class="rounded-2xl border border-[#EFE3C8] p-5">
+      <div class="flex flex-col sm:flex-row gap-5 items-center">
+        <img class="w-32 h-32 border rounded-lg p-2 bg-white" src="${makeQrUrl(code)}" alt="QR chứa mã ${escapeHTML(code)}" loading="lazy">
+        <div class="min-w-0"><span class="inline-flex rounded-full bg-[#F4EAD5] px-3 py-1 text-xs font-bold mb-2">DỮ LIỆU MINH HỌA</span>
+          <h3 class="serif text-xl font-bold">${escapeHTML(data.product)}</h3><p class="font-mono text-sm mt-1">${escapeHTML(code)}</p>
+          <p class="text-xs text-slate-500 mt-2">${escapeHTML(data.status)}</p></div>
+      </div>
+      <dl class="grid sm:grid-cols-2 gap-3 mt-5 text-sm">
+        <div class="bg-[#FAF7F2] rounded-lg p-3"><dt class="text-slate-500 text-xs">Nông trại</dt><dd class="font-semibold mt-1">${escapeHTML(data.farm)}</dd></div>
+        <div class="bg-[#FAF7F2] rounded-lg p-3"><dt class="text-slate-500 text-xs">Thu hoạch</dt><dd class="font-semibold mt-1">${escapeHTML(data.harvest)}</dd></div>
+        <div class="bg-[#FAF7F2] rounded-lg p-3"><dt class="text-slate-500 text-xs">Đóng gói</dt><dd class="font-semibold mt-1">${escapeHTML(data.packing)}</dd></div>
+        <div class="bg-[#FAF7F2] rounded-lg p-3"><dt class="text-slate-500 text-xs">Bảo quản</dt><dd class="font-semibold mt-1">${escapeHTML(data.storage)}</dd></div>
+      </dl>
+      <p class="text-xs text-slate-500 mt-4">QR này chỉ mã hóa mã lô; thông tin trên là dữ liệu mẫu, không xác nhận chứng nhận hoặc an toàn thực phẩm.</p>
+    </div>`;
+  });
+
+  // Contact request: validates and prepares a local text receipt only.
+  const contactForm=$("#contact-form"), contactFeedback=$("#contact-feedback"), contactDownload=$("#download-contact");
+  let contactText="";
+  contactForm.addEventListener("submit",e=>{
+    e.preventDefault();
+    if(!contactForm.reportValidity()) return;
+    contactText=formToText("PHIẾU YÊU CẦU LIÊN HỆ / ĐẶT HÀNG ANVITA",contactForm);
+    showStatus(contactFeedback,"Đã tạo phiếu yêu cầu trên trình duyệt. Yêu cầu chưa được gửi đến ANVITA vì website chưa kết nối máy chủ hoặc email.","ok");
+    contactDownload.classList.remove("hidden");
+  });
+  contactDownload.addEventListener("click",()=>downloadText("phieu-lien-he-anvita.txt",contactText));
+})();
+</script>
+</body>
+</html>
